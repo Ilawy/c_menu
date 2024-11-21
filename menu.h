@@ -26,5 +26,6 @@ typedef struct AppState
     int choice;
     char running;
 
+
     int generic[GENERIC_LEN];
 } AppState;

@@ -174,9 +174,9 @@ void new_employee_init(AppState *state)
         .month = month,
         .year = year};
     // TODO: FIXME
-    Employee emp = {.name = name, .salary = salary, .id = employeeCount, .bDate = bDate};
-    staff[employeeCount] = emp;
+    Employee emp = {.salary = salary, .id = employeeCount, .bDate = bDate};
     strcpy(emp.name, name);
+    staff[employeeCount] = emp;
     employeeCount++;
     // renderMenu(state);
     // exit(3);
@@ -266,7 +266,7 @@ int main()
     AppState state = {
         .choice = 0,
         .running = 1,
-        .currentMenu = &newEmployeeMenu};
+        .currentMenu = &mainMenu};
     state.menus[MENU_MAIN] = &mainMenu;
     state.menus[MENU_NEW_EMPLOYEE] = &newEmployeeMenu;
     state.menus[MENU_MANAGE_EMPLOYEES] = &manageEmployeesMenu;
