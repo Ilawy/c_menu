@@ -110,6 +110,7 @@ void return_to_main(AppState *state)
 */
 
 // NEW EMPLOYEE
+//TODO rename to: return_to_new_employee
 void new_employee_callback(AppState *state)
 {
     state->currentMenu = state->menus[MENU_NEW_EMPLOYEE];
@@ -121,6 +122,7 @@ void new_employee_init(AppState *state)
     {
         printf("Too many employees, press any key to go back\n");
         getch();
+        //TODO: use return to main
         state->currentMenu = state->menus[MENU_MAIN];
         system("clear");
         renderMenu(state);
@@ -171,11 +173,11 @@ void new_employee_init(AppState *state)
         .day = day,
         .month = month,
         .year = year};
+    // TODO: FIXME
     Employee emp = {.name = name, .salary = salary, .id = employeeCount, .bDate = bDate};
     staff[employeeCount] = emp;
     strcpy(emp.name, name);
     employeeCount++;
-    // printf("SHIT");
     // renderMenu(state);
     // exit(3);
     return_to_main(state);
@@ -186,6 +188,7 @@ void new_employee_init(AppState *state)
 */
 
 // MANAGE EMPLOYEES
+// TODO: rename to: return_tp_manage_employees
 void manage_employees_callback(AppState *state)
 {
     state->choice = 0;
@@ -216,6 +219,7 @@ void manage_employees_init(AppState *state)
 */
 
 // EMPLOYEE OPTIONS
+//TODO: rename to: return_to_user_options
 void user_options_callback(AppState *state)
 {
     state->currentMenu = state->menus[MENU_USER_OPTIONS];
@@ -226,8 +230,7 @@ void user_options_init(AppState *state)
     // printf("YO");
 }
 
-// why did you do this?
-//  to be able to set the main menu again from other menus
+
 
 int main()
 {
