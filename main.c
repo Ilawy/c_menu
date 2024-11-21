@@ -67,6 +67,7 @@ void noop(AppState *state)
 }
 
 // MAIN
+// TODO: rename to main_render
 void main_init(AppState *state)
 {
     char str[32];
@@ -91,6 +92,7 @@ void return_to_new_employee(AppState *state)
     state->currentMenu = state->menus[MENU_NEW_EMPLOYEE];
     renderMenu(state);
 }
+//TODO rename to new_employee_render
 void new_employee_init(AppState *state)
 {
     if (state->employeesCount >= MAX_EMPLOYEE_LEN)
@@ -159,13 +161,13 @@ void new_employee_init(AppState *state)
 */
 
 // MANAGE EMPLOYEES
-// TODO: rename to: return_tp_manage_employees
 void return_to_manage_employees(AppState *state)
 {
     state->choice = 0;
     state->currentMenu = state->menus[MENU_MANAGE_EMPLOYEES];
     renderMenu(state);
 }
+//TODO rename to manage_employees_render
 void manage_employees_init(AppState *state)
 {
     for (int i = 0; i < state->employeesCount; i++)
@@ -195,6 +197,7 @@ void return_to_user_options(AppState *state)
     state->currentMenu = state->menus[MENU_USER_OPTIONS];
     renderMenu(state);
 }
+//TODO rename to user_options_render
 void user_options_init(AppState *state)
 {
     // printf("YO");
