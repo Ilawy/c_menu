@@ -59,9 +59,7 @@ void runApp(AppState *state)
             renderMenu(state);
             break;
         case Enter:
-            // printf("FUCK OFF %p", state->currentMenu->callbacks[state->choice]);
             MenuCallback callback = state->currentMenu->callbacks[state->choice];
-            printf("FUCK OFF %p\n", callback);
             callback(state);
             break;
         case Home:
@@ -371,7 +369,7 @@ int main()
     Menu newEmployeeMenu = {
         .title = "New Employee",
         .size = 0,
-        .items = {"Fuck OFF"},
+        .items = {},
         .onRender = &new_employee_render,
         .callbacks = {&return_to_main}};
 
