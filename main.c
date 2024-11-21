@@ -106,6 +106,9 @@ void return_to_main(AppState *state)
     state->currentMenu = state->menus[MENU_MAIN];
     renderMenu(state);
 }
+void main_quit(AppState *state){
+    exit(0);
+}
 /*
 
 
@@ -363,7 +366,7 @@ int main()
         .title = "Main Menu",
         .size = 3,
         .items = {"New Employee", "Manage Employees", "Quit"},
-        .callbacks = {&return_to_new_employee, &return_to_manage_employees, &noop},
+        .callbacks = {&return_to_new_employee, &return_to_manage_employees, &main_quit},
         .onRender = &main_render};
 
     Menu newEmployeeMenu = {
