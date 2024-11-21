@@ -5,6 +5,7 @@
 #include "inputter.h"
 
 
+
 void renderMenu(AppState *state)
 {
     system("clear");
@@ -18,8 +19,9 @@ void renderMenu(AppState *state)
             textbackground(WHITE);
             textcolor(BLUE);
         }
-
-        printf("%d) %s\n", i, state->currentMenu->items[i]);
+        if (state->renderID)
+            printf("%d)", i + 1);
+        printf("%s\n", state->currentMenu->items[i]);
         resetTextColor();
         resetBackgroundColor();
     }
@@ -56,7 +58,6 @@ void runApp(AppState *state)
 
 // menu item callback
 
-
 void return_to_user_options(AppState *);
 
 // WARINING GLOBAL VARS
@@ -67,13 +68,10 @@ void noop(AppState *state)
 }
 
 // MAIN
-// TODO: rename to main_render
-void main_init(AppState *state)
+void main_render(AppState *state)
 {
-    char str[32];
-    sprintf(state->currentMenu->items[1], "Manage Employees (%d)", state->employeesCount);
-    // set second item of the menu
-    printf("MY SIZE: %d\n", state->currentMenu->size);
+    // char str[32];
+    // sprintf(state->currentMenu->items[1], "Manage Employees (%d)", state->employeesCount);
 }
 void return_to_main(AppState *state)
 {
@@ -92,8 +90,7 @@ void return_to_new_employee(AppState *state)
     state->currentMenu = state->menus[MENU_NEW_EMPLOYEE];
     renderMenu(state);
 }
-//TODO rename to new_employee_render
-void new_employee_init(AppState *state)
+void new_employee_render(AppState *state)
 {
     if (state->employeesCount >= MAX_EMPLOYEE_LEN)
     {
@@ -103,56 +100,58 @@ void new_employee_init(AppState *state)
         return;
     }
 
-    char name[32];
+    char name[33];
     int salary = 0;
     int day = 0;
     int month = 0;
     int year = 0;
     printf("Enter name: ");
-    fgets(name, 32, stdin);
-    printf("HELLO %s", name);
-    // salary = prompt_int("Enter salary(numbers only): ");
-    // printf("\n");
-    // while (salary <= 0)
-    // {
-    //     printf("salary must be greater than 0\n");
-    //     salary = prompt_int("Enter salary(numbers only): ");
-    //     printf("\n");
-    // }
-    // day = prompt_int("Enter birth day(numbers only): ");
-    // printf("\n");
-    // while (day <= 0 || day > 31)
-    // {
-    //     printf("day must be between 1 and 31\n");
-    //     day = prompt_int("Enter birth day(numbers only): ");
-    //     printf("\n");
-    // }
-    // month = prompt_int("Enter birth month(numbers only): ");
-    // printf("\n");
-    // while (month <= 0 || month > 12)
-    // {
-    //     printf("month must be between 1 and 12\n");
-    //     month = prompt_int("Enter birth month(numbers only): ");
-    //     printf("\n");
-    // }
-    // year = prompt_int("Enter birth year(numbers only): ");
-    // while (year <= 1950)
-    // { // SUBJECT TO CHANGE
-    //     printf("year must be greater than 0\n");
-    //     year = prompt_int("Enter birth year(numbers only): ");
-    //     printf("\n");
-    // }
-    // printf("\n");
+    // https://stackoverflow.com/a/56095515
+    // %[*][width][modifiers]type
+    scanf("%[^\n]%c", name);
+    fgetc(stdin);
+    salary = prompt_int("Enter salary(numbers only): ");
+    printf("\n");
+    while (salary <= 0)
+    {
+        printf("salary must be greater than 0\n");
+        salary = prompt_int("Enter salary(numbers only): ");
+        printf("\n");
+    }
+    day = prompt_int("Enter birth day(numbers only): ");
+    printf("\n");
+    while (day <= 0 || day > 31)
+    {
+        printf("day must be between 1 and 31\n");
+        day = prompt_int("Enter birth day(numbers only): ");
+        printf("\n");
+    }
+    month = prompt_int("Enter birth month(numbers only): ");
+    printf("\n");
+    while (month <= 0 || month > 12)
+    {
+        printf("month must be between 1 and 12\n");
+        month = prompt_int("Enter birth month(numbers only): ");
+        printf("\n");
+    }
+    year = prompt_int("Enter birth year(numbers only): ");
+    while (year <= MIN_EMPLOYEE_BYEAR)
+    { // SUBJECT TO CHANGE
+        printf("year must be greater than 0\n");
+        year = prompt_int("Enter birth year(numbers only): ");
+        printf("\n");
+    }
+    printf("\n");
     Date bDate = {
         .day = day,
         .month = month,
         .year = year};
-    Employee emp = {.salary = salary, .id = state->employeesCount, .bDate = bDate};
+    Employee emp = {.salary = salary, .id = state->uniq, .bDate = bDate};
     strcpy(emp.name, name);
     state->employees[state->employeesCount] = emp;
     state->employeesCount++;
-    // renderMenu(state);
-    // exit(3);
+    state->uniq++;
+    
     return_to_main(state);
 }
 /*
@@ -167,15 +166,13 @@ void return_to_manage_employees(AppState *state)
     state->currentMenu = state->menus[MENU_MANAGE_EMPLOYEES];
     renderMenu(state);
 }
-//TODO rename to manage_employees_render
-void manage_employees_init(AppState *state)
+void manage_employees_render(AppState *state)
 {
     for (int i = 0; i < state->employeesCount; i++)
     {
         char title[32];
-        // printf("-%s-\n\n", &staff[i].name[0]);
-        // sprintf(title, "[%d] %s", staff[i].id, staff[i].name);
-        strcpy(state->currentMenu->items[i], state->employees[i].name);
+        sprintf(title, "[%d] %s", state->employees[i].id, state->employees[i].name);
+        strcpy(state->currentMenu->items[i], title);
         // *state->currentMenu->items[i] = staff[i].name;
         state->currentMenu->callbacks[i] = &return_to_user_options;
     }
@@ -183,8 +180,6 @@ void manage_employees_init(AppState *state)
     state->currentMenu->size = state->employeesCount + 1; // +1 for back
     strcpy(state->currentMenu->items[state->employeesCount], "Back");
     state->currentMenu->callbacks[state->employeesCount] = &return_to_main;
-
-    // state->choice = 0;
 }
 /*
 
@@ -195,15 +190,134 @@ void manage_employees_init(AppState *state)
 void return_to_user_options(AppState *state)
 {
     state->currentMenu = state->menus[MENU_USER_OPTIONS];
+    // this one was good, i like it
+    state->generic[GENERIC_CURRENT_USER_INDEX] = state->choice;
+    state->choice = 0;
     renderMenu(state);
 }
-//TODO rename to user_options_render
-void user_options_init(AppState *state)
+void user_options_render(AppState *state)
 {
-    // printf("YO");
 }
 
+void employee_show(AppState *state)
+{
+    Employee currentEmployee = state->employees[state->generic[GENERIC_CURRENT_USER_INDEX]];
+    system("clear");
+    printEmployee(currentEmployee);
+    printf("Press any key to go back");
+    getch();
+    return_to_user_options(state);
+}
 
+// EMPLOYEE MODIFY
+void return_to_employee_modify(AppState *state)
+{
+    state->currentMenu = state->menus[MENU_EMPLOYEE_MODIFY];
+    state->choice = 0;
+    printf("%s", state->currentMenu->title);
+    renderMenu(state);
+}
+
+void employee_modify_name(AppState *state)
+{
+    Employee currentEmployee = state->employees[state->generic[GENERIC_CURRENT_USER_INDEX]];
+    system("clear");
+    printf("Enter new name: ");
+    char name[32] = {0};
+    // scanf("%[^\n]%c", name);
+    scanf("%32[^\n]%c", name);
+    fgetc(stdin);
+    strcpy(state->employees[state->generic[GENERIC_CURRENT_USER_INDEX]].name, name);
+    return_to_employee_modify(state);
+}
+void employee_modify_salary(AppState *state)
+{
+    Employee currentEmployee = state->employees[state->generic[GENERIC_CURRENT_USER_INDEX]];
+    system("clear");
+    int salary = prompt_int("Enter new salary: ");
+    state->employees[state->generic[GENERIC_CURRENT_USER_INDEX]].salary = salary;
+    return_to_employee_modify(state);
+}
+void employee_modify_bdate(AppState *state)
+{
+    Employee currentEmployee = state->employees[state->generic[GENERIC_CURRENT_USER_INDEX]];
+    system("clear");
+    // day
+    int day = prompt_int("Enter day: ");
+    printf("\n");
+    while (day <= 0 || day > 31)
+    {
+        day = prompt_int("Enter a valid day (between 1 and 31): ");
+        printf("\n");
+    }
+    // month
+    int month = prompt_int("Enter month: ");
+    printf("\n");
+    while (month < 1 || month > 12)
+    {
+        month = prompt_int("Enter a valid month (between 1 and 12): ");
+        printf("\n");
+    }
+    // year
+    int year = prompt_int("Enter year: ");
+    printf("\n");
+    while (year <= MIN_EMPLOYEE_BYEAR)
+    {
+        year = prompt_int("Enter a valid year (more than 1924): ");
+        printf("\n");
+    }
+
+    // assign
+    state->employees[state->generic[GENERIC_CURRENT_USER_INDEX]].bDate.day = day;
+    state->employees[state->generic[GENERIC_CURRENT_USER_INDEX]].bDate.month = month;
+    state->employees[state->generic[GENERIC_CURRENT_USER_INDEX]].bDate.year = year;
+    return_to_employee_modify(state);
+}
+
+void employee_delete(AppState *state)
+{
+    Employee currentEmployee = state->employees[state->generic[GENERIC_CURRENT_USER_INDEX]];
+    int deleted_index = -1;
+    for (int i = 0; i < MAX_EMPLOYEE_LEN; i++)
+    {
+        Employee *emp = &state->employees[i];
+        if( emp->id == currentEmployee.id){
+            deleted_index = i;
+            state->employees[i] =  (Employee){};
+        }else if(deleted_index != -1){
+            state->employees[i-1] = *emp;
+        }
+        // for(int i = 0;)
+    }
+    state->employeesCount--;
+    if(state->employeesCount > 0)return_to_manage_employees(state);
+    else return_to_main(state);
+    // exit(3);
+}
+
+void employee_modify_render(AppState *state)
+{
+    Employee currentEmployee = state->employees[state->generic[GENERIC_CURRENT_USER_INDEX]];
+    state->currentMenu->size = 4; // name - salary - birthdate - back
+
+    // name
+    sprintf(state->currentMenu->items[0], "Change name (%s)", currentEmployee.name);
+    state->currentMenu->callbacks[0] = &employee_modify_name;
+
+    // salary
+    sprintf(state->currentMenu->items[1], "Change salary (%d)", currentEmployee.salary);
+    state->currentMenu->callbacks[1] = &employee_modify_salary;
+
+    // bdate
+    sprintf(state->currentMenu->items[2], "Change birth date (%d/%d/%d)", currentEmployee.bDate.day, currentEmployee.bDate.month, currentEmployee.bDate.year);
+    state->currentMenu->callbacks[2] = &employee_modify_bdate;
+
+    // back
+    sprintf(state->currentMenu->items[3], "back");
+    state->currentMenu->callbacks[3] = &return_to_user_options;
+}
+
+// EMPLOYEE METHODS
 
 int main()
 {
@@ -213,37 +327,52 @@ int main()
         .size = 3,
         .items = {"New Employee", "Manage Employees", "Quit"},
         .callbacks = {&return_to_new_employee, &return_to_manage_employees, &noop},
-        .onRender = &main_init};
+        .onRender = &main_render};
 
     Menu newEmployeeMenu = {
         .title = "New Employee",
         .size = 0,
         .items = {"Fuck OFF"},
-        .onRender = &new_employee_init,
+        .onRender = &new_employee_render,
         .callbacks = {&return_to_main}};
 
     Menu manageEmployeesMenu = {
         .title = "Manage Employees",
         .size = 0,
         .items = {},
-        .onRender = &manage_employees_init,
+        .onRender = &manage_employees_render,
         .callbacks = {&return_to_main}};
 
     Menu userOptionsMenu = {
         .title = "User Options",
         .size = 4,
         .items = {"Show", "Modify", "Delete", "Return"},
-        .onRender = &user_options_init,
-        .callbacks = {&noop, &noop, &noop, &return_to_manage_employees}};
+        .onRender = &user_options_render,
+        .callbacks = {&employee_show, &return_to_employee_modify, &employee_delete, &return_to_manage_employees}};
+
+    Menu employeeModifyMenu = {
+        .title = "User Modification",
+        .size = 0,
+        .items = {},
+        .onRender = &employee_modify_render
+
+    };
 
     AppState state = {
         .choice = 0,
         .running = 1,
+        .employees = {0},
+        .employeesCount = 0,
+        .uniq = 1,
+        .renderID = 0,
         .currentMenu = &mainMenu};
     state.menus[MENU_MAIN] = &mainMenu;
     state.menus[MENU_NEW_EMPLOYEE] = &newEmployeeMenu;
     state.menus[MENU_MANAGE_EMPLOYEES] = &manageEmployeesMenu;
     state.menus[MENU_USER_OPTIONS] = &userOptionsMenu;
+    state.menus[MENU_EMPLOYEE_MODIFY] = &employeeModifyMenu;
+
+
     runApp(&state);
     return 0;
 }

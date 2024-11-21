@@ -2,16 +2,20 @@
 
 #define MAX_MENU_ITEMS 16
 #define MAX_STATE_MENUS 15
-#define MAX_MENU_TITLE_LEN 16
+#define MAX_MENU_TITLE_LEN 24
 #define MAX_ITEM_LEN 32
 #define GENERIC_LEN 4
 
 #define MAX_EMPLOYEE_LEN 10
+#define MIN_EMPLOYEE_BYEAR 1924
 
 #define MENU_MAIN 0
 #define MENU_NEW_EMPLOYEE 1
 #define MENU_MANAGE_EMPLOYEES 2
 #define MENU_USER_OPTIONS 3
+#define MENU_EMPLOYEE_MODIFY 4
+
+#define GENERIC_CURRENT_USER_INDEX 0
 
 
 typedef struct Date
@@ -56,6 +60,15 @@ typedef struct AppState
     int employeesCount;
     int uniq;
 
+    char renderID;
 
     int generic[GENERIC_LEN];
 } AppState;
+
+
+void printEmployee(Employee emp){
+    printf("Name: %s\n\
+ID: %d\n\
+SALARY: %d\n\
+B.Date: %d/%d/%d\n", emp.name, emp.id, emp.salary, emp.bDate.day, emp.bDate.month, emp.bDate.year);
+}
