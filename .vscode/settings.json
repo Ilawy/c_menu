@@ -4,6 +4,10 @@
     "cstdio": "c",
     "string_view": "c",
     "functional": "c",
-    "menu.h": "c"
+    "menu.h": "c",
+    "inputter.h": "c",
+    "stdio.h": "c",
+    "stdm.h": "c",
+    "keyboard.h": "c"
   }
 }

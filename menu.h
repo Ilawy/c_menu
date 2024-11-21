@@ -1,4 +1,6 @@
 #include "stdio.h"
+#include <sys/ioctl.h>
+
 
 #define MAX_MENU_ITEMS 16
 #define MAX_STATE_MENUS 15
@@ -62,13 +64,17 @@ typedef struct AppState
 
     char renderID;
 
+    struct winsize winsize;
+
     int generic[GENERIC_LEN];
 } AppState;
 
 
 void printEmployee(Employee emp){
-    printf("Name: %s\n\
+    printf("----------\n\
+Name: %s\n\
 ID: %d\n\
 SALARY: %d\n\
-B.Date: %d/%d/%d\n", emp.name, emp.id, emp.salary, emp.bDate.day, emp.bDate.month, emp.bDate.year);
+B.Date: %d/%d/%d\n\
+----------\n", emp.name, emp.id, emp.salary, emp.bDate.day, emp.bDate.month, emp.bDate.year);
 }

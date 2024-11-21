@@ -1,15 +1,17 @@
 #include "stdio.h"
 #include "conio.h"
-#include "stdm.c"
 #include "menu.h"
 #include "inputter.h"
+#include "stdm.h"
+#include "keyboard.c"
 
-
+//
 
 void renderMenu(AppState *state)
 {
     system("clear");
     printf("%s\n", state->currentMenu->title);
+
     //
     state->currentMenu->onRender(state);
     for (int i = 0; i < state->currentMenu->size; i++)
@@ -25,6 +27,15 @@ void renderMenu(AppState *state)
         resetTextColor();
         resetBackgroundColor();
     }
+    int oldx = 0, oldy = 0;
+    wherexy(&oldx, &oldy);
+    gotoxy(0, state->winsize.ws_row);
+    textbackground(WHITE);
+    textcolor(RED);
+    printf("ENTER / ↑ / ↓ / HOME / END");
+    resetBackgroundColor();
+    resetTextColor();
+    gotoxy(oldx, oldy);
 }
 
 void runApp(AppState *state)
@@ -34,6 +45,7 @@ void runApp(AppState *state)
     renderMenu(state);
     while (1)
     {
+        ioctl(STDOUT_FILENO, TIOCGWINSZ, state->winsize);
         KeyboardButton button = captureKeyboardInput();
         switch (button)
         {
@@ -52,6 +64,23 @@ void runApp(AppState *state)
             printf("FUCK OFF %p\n", callback);
             callback(state);
             break;
+        case Home:
+            state->choice = 0;
+            renderMenu(state);
+            break;
+        case End:
+            state->choice = state->currentMenu->size - 1;
+            renderMenu(state);
+            break;
+        case Escape:
+            system("clear");
+            printf("Are you sure you want to exit the app (y/N)?\n");
+            char ch = getch();
+            if (ch == KEY_Y)
+                exit(0);
+            else renderMenu(state);
+            break;
+            ;
         }
     }
 }
@@ -100,7 +129,7 @@ void new_employee_render(AppState *state)
         return;
     }
 
-    char name[33];
+    char name[32];
     int salary = 0;
     int day = 0;
     int month = 0;
@@ -110,6 +139,12 @@ void new_employee_render(AppState *state)
     // %[*][width][modifiers]type
     scanf("%[^\n]%c", name);
     fgetc(stdin);
+    while (strlen(name) == 0 || strlen(name) > 32)
+    {
+        printf("Please enter a name: ");
+        scanf("%[^\n]%c", name);
+        fgetc(stdin);
+    }
     salary = prompt_int("Enter salary(numbers only): ");
     printf("\n");
     while (salary <= 0)
@@ -151,7 +186,6 @@ void new_employee_render(AppState *state)
     state->employees[state->employeesCount] = emp;
     state->employeesCount++;
     state->uniq++;
-    
     return_to_main(state);
 }
 /*
@@ -281,17 +315,22 @@ void employee_delete(AppState *state)
     for (int i = 0; i < MAX_EMPLOYEE_LEN; i++)
     {
         Employee *emp = &state->employees[i];
-        if( emp->id == currentEmployee.id){
+        if (emp->id == currentEmployee.id)
+        {
             deleted_index = i;
-            state->employees[i] =  (Employee){};
-        }else if(deleted_index != -1){
-            state->employees[i-1] = *emp;
+            state->employees[i] = (Employee){};
+        }
+        else if (deleted_index != -1)
+        {
+            state->employees[i - 1] = *emp;
         }
         // for(int i = 0;)
     }
     state->employeesCount--;
-    if(state->employeesCount > 0)return_to_manage_employees(state);
-    else return_to_main(state);
+    if (state->employeesCount > 0)
+        return_to_manage_employees(state);
+    else
+        return_to_main(state);
     // exit(3);
 }
 
@@ -357,6 +396,7 @@ int main()
         .onRender = &employee_modify_render
 
     };
+    struct winsize w;
 
     AppState state = {
         .choice = 0,
@@ -365,13 +405,13 @@ int main()
         .employeesCount = 0,
         .uniq = 1,
         .renderID = 0,
+        .winsize = w,
         .currentMenu = &mainMenu};
     state.menus[MENU_MAIN] = &mainMenu;
     state.menus[MENU_NEW_EMPLOYEE] = &newEmployeeMenu;
     state.menus[MENU_MANAGE_EMPLOYEES] = &manageEmployeesMenu;
     state.menus[MENU_USER_OPTIONS] = &userOptionsMenu;
     state.menus[MENU_EMPLOYEE_MODIFY] = &employeeModifyMenu;
-
 
     runApp(&state);
     return 0;
