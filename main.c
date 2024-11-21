@@ -4,12 +4,6 @@
 #include "menu.h"
 #include "inputter.h"
 
-#define MAX_STAFF_COUNT 10
-
-#define MENU_MAIN 0
-#define MENU_NEW_EMPLOYEE 1
-#define MENU_MANAGE_EMPLOYEES 2
-#define MENU_USER_OPTIONS 3
 
 void renderMenu(AppState *state)
 {
@@ -62,29 +56,11 @@ void runApp(AppState *state)
 
 // menu item callback
 
-typedef struct Date
-{
-    char day;
-    char month;
-    int year;
 
-} Date;
-
-typedef struct Employee
-{
-    int id;
-    char name[32];
-    int salary;
-    Date bDate;
-
-} Employee;
-
-void user_options_callback(AppState *);
+void return_to_user_options(AppState *);
 
 // WARINING GLOBAL VARS
 // SORRY FOR USING GLOBAL VARS, WE WILL DISCUSS THIS LATER
-Employee staff[MAX_STAFF_COUNT];
-int employeeCount = 0;
 
 void noop(AppState *state)
 {
@@ -94,7 +70,7 @@ void noop(AppState *state)
 void main_init(AppState *state)
 {
     char str[32];
-    sprintf(state->currentMenu->items[1], "Manage Employees (%d)", employeeCount);
+    sprintf(state->currentMenu->items[1], "Manage Employees (%d)", state->employeesCount);
     // set second item of the menu
     printf("MY SIZE: %d\n", state->currentMenu->size);
 }
@@ -110,22 +86,18 @@ void return_to_main(AppState *state)
 */
 
 // NEW EMPLOYEE
-//TODO rename to: return_to_new_employee
-void new_employee_callback(AppState *state)
+void return_to_new_employee(AppState *state)
 {
     state->currentMenu = state->menus[MENU_NEW_EMPLOYEE];
     renderMenu(state);
 }
 void new_employee_init(AppState *state)
 {
-    if (employeeCount >= MAX_STAFF_COUNT)
+    if (state->employeesCount >= MAX_EMPLOYEE_LEN)
     {
         printf("Too many employees, press any key to go back\n");
         getch();
-        //TODO: use return to main
-        state->currentMenu = state->menus[MENU_MAIN];
-        system("clear");
-        renderMenu(state);
+        return_to_main(state);
         return;
     }
 
@@ -173,11 +145,10 @@ void new_employee_init(AppState *state)
         .day = day,
         .month = month,
         .year = year};
-    // TODO: FIXME
-    Employee emp = {.salary = salary, .id = employeeCount, .bDate = bDate};
+    Employee emp = {.salary = salary, .id = state->employeesCount, .bDate = bDate};
     strcpy(emp.name, name);
-    staff[employeeCount] = emp;
-    employeeCount++;
+    state->employees[state->employeesCount] = emp;
+    state->employeesCount++;
     // renderMenu(state);
     // exit(3);
     return_to_main(state);
@@ -189,7 +160,7 @@ void new_employee_init(AppState *state)
 
 // MANAGE EMPLOYEES
 // TODO: rename to: return_tp_manage_employees
-void manage_employees_callback(AppState *state)
+void return_to_manage_employees(AppState *state)
 {
     state->choice = 0;
     state->currentMenu = state->menus[MENU_MANAGE_EMPLOYEES];
@@ -197,19 +168,19 @@ void manage_employees_callback(AppState *state)
 }
 void manage_employees_init(AppState *state)
 {
-    for (int i = 0; i < employeeCount; i++)
+    for (int i = 0; i < state->employeesCount; i++)
     {
         char title[32];
         // printf("-%s-\n\n", &staff[i].name[0]);
         // sprintf(title, "[%d] %s", staff[i].id, staff[i].name);
-        strcpy(state->currentMenu->items[i], staff[i].name);
+        strcpy(state->currentMenu->items[i], state->employees[i].name);
         // *state->currentMenu->items[i] = staff[i].name;
-        state->currentMenu->callbacks[i] = &user_options_callback;
+        state->currentMenu->callbacks[i] = &return_to_user_options;
     }
 
-    state->currentMenu->size = employeeCount + 1; // +1 for back
-    strcpy(state->currentMenu->items[employeeCount], "Back");
-    state->currentMenu->callbacks[employeeCount] = &return_to_main;
+    state->currentMenu->size = state->employeesCount + 1; // +1 for back
+    strcpy(state->currentMenu->items[state->employeesCount], "Back");
+    state->currentMenu->callbacks[state->employeesCount] = &return_to_main;
 
     // state->choice = 0;
 }
@@ -219,8 +190,7 @@ void manage_employees_init(AppState *state)
 */
 
 // EMPLOYEE OPTIONS
-//TODO: rename to: return_to_user_options
-void user_options_callback(AppState *state)
+void return_to_user_options(AppState *state)
 {
     state->currentMenu = state->menus[MENU_USER_OPTIONS];
     renderMenu(state);
@@ -239,7 +209,7 @@ int main()
         .title = "Main Menu",
         .size = 3,
         .items = {"New Employee", "Manage Employees", "Quit"},
-        .callbacks = {&new_employee_callback, &manage_employees_callback, &noop},
+        .callbacks = {&return_to_new_employee, &return_to_manage_employees, &noop},
         .onRender = &main_init};
 
     Menu newEmployeeMenu = {
@@ -261,7 +231,7 @@ int main()
         .size = 4,
         .items = {"Show", "Modify", "Delete", "Return"},
         .onRender = &user_options_init,
-        .callbacks = {&noop, &noop, &noop, &manage_employees_callback}};
+        .callbacks = {&noop, &noop, &noop, &return_to_manage_employees}};
 
     AppState state = {
         .choice = 0,
