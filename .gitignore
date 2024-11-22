@@ -4,3 +4,4 @@ stdm_test
 menu
 tmp/build-errors.log
 inputter_test
+inputter
