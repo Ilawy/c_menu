@@ -4,7 +4,7 @@
 
 #define MAX_MENU_ITEMS 16
 #define MAX_STATE_MENUS 15
-#define MAX_MENU_TITLE_LEN 24
+#define MAX_MENU_TITLE_LEN 64
 #define MAX_ITEM_LEN 32
 #define GENERIC_LEN 4
 

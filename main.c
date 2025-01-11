@@ -106,6 +106,7 @@ void return_to_main(AppState *state)
     state->currentMenu = state->menus[MENU_MAIN];
     renderMenu(state);
 }
+
 void main_quit(AppState *state){
     exit(0);
 }
@@ -138,7 +139,7 @@ void new_employee_render(AppState *state)
     printf("Enter name: ");
     // https://stackoverflow.com/a/56095515
     // %[*][width][modifiers]type
-    scanf("%[^\n]%c", name);
+    scanf("%[^\n]%*c", name);
     fgetc(stdin);
     while (strlen(name) == 0 || strlen(name) > 32)
     {
@@ -205,7 +206,7 @@ void manage_employees_render(AppState *state)
 {
     for (int i = 0; i < state->employeesCount; i++)
     {
-        char title[32];
+        char title[MAX_MENU_TITLE_LEN];
         sprintf(title, "[%d] %s", state->employees[i].id, state->employees[i].name);
         strcpy(state->currentMenu->items[i], title);
         // *state->currentMenu->items[i] = staff[i].name;
